@@ -6,6 +6,15 @@ const height = (canvas.height = window.innerHeight);
 const para = document.querySelector("p");
 const timerDiv = document.getElementById("timer");
 const winMessage = document.getElementById("win-message");
+const startContainer = document.getElementById("start-container");
+const startButton = document.getElementById("start-button");
+
+// Game variables
+let balls = [];
+let ballCount = 0;
+let startTime = 0;
+let gameRunning = false;
+let evilCircle = null;
 
 // Helper functions
 function random(min, max) {
@@ -128,13 +137,6 @@ class EvilCircle extends Shape {
   }
 }
 
-// Game variables
-let balls = [];
-let ballCount = 0;
-let startTime = Date.now();
-let timerId;
-const evilCircle = new EvilCircle(width / 2, height / 2);
-
 // Initialize balls
 function initBalls() {
   balls = [];
@@ -154,34 +156,39 @@ function initBalls() {
   }
   para.textContent = `Ball count: ${ballCount}`;
   startTime = Date.now();
-  winMessage.style.display = "none"; // Hide win message on reset
+  winMessage.style.display = "none";
+  evilCircle = new EvilCircle(width / 2, height / 2);
 }
 
 // Update HTML-based timer
 function updateTimer() {
-    if (ballCount === 0) return; // Stop updating when game is won
-  
-    const elapsed = Math.floor((Date.now() - startTime) / 1000);
-    const hours = String(Math.floor(elapsed / 3600)).padStart(2, "0");
-    const minutes = String(Math.floor((elapsed % 3600) / 60)).padStart(2, "0");
-    const seconds = String(elapsed % 60).padStart(2, "0");
-  
-    timerDiv.textContent = `Time: ${hours}:${minutes}:${seconds}`;
-}  
+  if (ballCount === 0 || !gameRunning) return;
+
+  const elapsed = Math.floor((Date.now() - startTime) / 1000);
+  const hours = String(Math.floor(elapsed / 3600)).padStart(2, "0");
+  const minutes = String(Math.floor((elapsed % 3600) / 60)).padStart(2, "0");
+  const seconds = String(elapsed % 60).padStart(2, "0");
+
+  timerDiv.textContent = `Time: ${hours}:${minutes}:${seconds}`;
+}
 
 // Show "You Win!" using HTML
 function showWinMessage() {
-    winMessage.style.display = "block";
-  
-    const playAgainButton = document.getElementById("play-again");
-    playAgainButton.addEventListener("click", () => {
-        initBalls(); // Re-initialize balls
-        startTime = Date.now(); // Restart the timer        
-    });
-}  
+  winMessage.style.display = "block";
+  gameRunning = false;
+
+  const playAgainButton = document.getElementById("play-again");
+  playAgainButton.onclick = () => {
+    initBalls(); // Re-initialize balls
+    gameRunning = true; // Restart game loop
+    loop();
+  };
+}
 
 // Main game loop
 function loop() {
+  if (!gameRunning) return;
+
   ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
   ctx.fillRect(0, 0, width, height);
 
@@ -193,23 +200,27 @@ function loop() {
     }
   }
 
-  evilCircle.draw();
-  evilCircle.move();
-  evilCircle.checkBounds();
-  evilCircle.collisionDetect();
+  if (evilCircle) {
+    evilCircle.draw();
+    evilCircle.move();
+    evilCircle.checkBounds();
+    evilCircle.collisionDetect();
+  }
+
   updateTimer();
 
   if (ballCount === 0) {
     showWinMessage();
-    clearTimeout(timerId);
-    timerId = setTimeout(() => {
-      initBalls();
-    }, 5000);
+    return;
   }
 
   requestAnimationFrame(loop);
 }
 
-// Start game
-initBalls();
-loop();
+// Start game when Start button is pressed
+startButton.onclick = () => {
+  startContainer.style.display = "none"; // Hide start overlay
+  initBalls(); // Setup game
+  gameRunning = true;
+  loop();
+};
