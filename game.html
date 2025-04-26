@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <!--
+    Name: Muntadher Al-Bawi
+
+    File: game.html
+
+    Date: 04 April 2025
+
+    This program adds an evil circle to the bouncing balls 
+    that you can control to destroy the balls on your screen until nothing is left.
+    -->
+    <title>Bouncing balls</title>
+    <link rel="stylesheet" href="/BouncingBallGame/game.css">
+  </head>
+
+  <body>
+    <h1>bouncing balls</h1>
+    <p>Ball count: </p>
+    <div id="timer">Time: 00:00:00</div>
+
+    <div id="start-container" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+      <button id="start-button" style="font-size: 1.5rem; padding: 10px 20px;">Start Game</button>
+    </div>
+
+    <div id="win-message" style="display: none; color: white; font-size: 2rem; text-align: center; margin-top: 20px;">
+        You Win!<br>
+        <button id="play-again" style="margin-top: 10px; font-size: 1rem; padding: 5px 10px;">Play Again?</button>
+    </div>
+
+    <canvas></canvas>
+    <p></p>
+
+    <script src="game.js"></script>
+  </body>
+</html>
